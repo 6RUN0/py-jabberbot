@@ -608,7 +608,11 @@ class JabberBot(object):
         text = mess.getBody()
         username = self.get_sender_username(mess)
 
-        if type not in ("groupchat", "chat"):
+        if type == 'groupchat':
+            private = False
+        elif type == 'chat':
+            private = True
+        else:
             self.log.debug("unhandled message type: %s" % type)
             return
 
@@ -659,7 +663,7 @@ class JabberBot(object):
                         (text, jid, traceback.format_exc(e)))
                     reply = self.MSG_ERROR_OCCURRED
                 if reply:
-                    self.send_simple_reply(mess, reply)
+                    self.send_simple_reply(mess, reply, private)
             # Experimental!
             # if command should be executed in a seperate thread do it
             if self.commands[cmd]._jabberbot_command_thread:
@@ -681,7 +685,7 @@ class JabberBot(object):
             if reply is None:
                 reply = default_reply
             if reply:
-                self.send_simple_reply(mess, reply)
+                self.send_simple_reply(mess, reply, private)
 
     def unknown_command(self, mess, cmd, args):
         """Default handler for unknown commands
